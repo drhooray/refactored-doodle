@@ -1,13 +1,29 @@
 pipeline {
     agent any
+
+    parameters {
+	choice(name: 'GIT_TAG', choices: ['20241206', '20250108_1730_388'], description: 'Select the Git tag to build')
+    }
+
     stages {
         stage('Run Groovy Script') {
             steps {
                 script {
                     def cloneScript = load 'pipeline/cloneRepo.groovy'
-                    cloneScript.cloneRepo()
+                    cloneScript.cloneRepo(params.GIT_TAG)
                 }
             }
         }
+	stage('Select and Checkout Tag') {
+	    steps {
+		script {
+			def selectScript = load 'vars/select.groovy'
+			def tags = selectScript.getGitTags()
+			def selectedTag = selectScript.selectTag(tags)
+			def cloneScript = load 'pipeline/cloneRepo.groovy'
+			cloneScript.cloneRepo(selectedTag)
+		}
+	   }
+	}
     }
 }
