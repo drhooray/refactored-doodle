@@ -1,12 +1,15 @@
+@Library('refactored-doodle')_
 pipeline {
     agent any
+
+    parameters {
+	choice(name: 'GIT_TAG', choices: ['20241206', '20250108_1730_388'], description: 'Select the Git tag to build')
+    }
+
     stages {
-        stage('Run Groovy Script') {
+        stage('Clone Repo') {
             steps {
-                script {
-                    def cloneScript = load 'pipeline/cloneRepo.groovy'
-                    cloneScript.cloneRepo()
-                }
+		cloneRepo(params.GIT_TAG)
             }
         }
     }
