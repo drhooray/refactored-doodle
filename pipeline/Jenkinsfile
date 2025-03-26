@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+    stages {
+        stage('Run Groovy Script') {
+            steps {
+                script {
+                    def cloneScript = load 'pipeline/cloneRepo.groovy'
+                    cloneScript.cloneRepo()
+                }
+            }
+        }
+    }
+}
