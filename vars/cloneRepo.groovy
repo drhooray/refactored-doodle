@@ -1,7 +1,13 @@
-def call(String tag) { def repoUrl = "https://github.com/intel/ipu7-drivers.git"
-	def targetDir = "ipu7-drivers"
+def call(String repoName = "ipu7-drivers") { 
+	def repoUrls = [
+		"ipu7-drivers": "https://github.com/intel/ipu7-drivers.git",
+		"ipu6-drivers": "https://github.com/intel/ipu6-drivers.git"
+	]
 
-	echo "Cloning ${repoUrl} with tag ${tag}"
+	def repoUrl = repoUrls[repoName]
+	def targetDir = repoName
+
+	echo "Cloning ${repoUrl}"
 
 	try {
 		sh """
@@ -17,3 +23,4 @@ def call(String tag) { def repoUrl = "https://github.com/intel/ipu7-drivers.git"
 	}
 }
 
+return this

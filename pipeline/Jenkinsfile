@@ -3,14 +3,41 @@ pipeline {
     agent any
 
     parameters {
-	choice(name: 'GIT_TAG', choices: ['20241206', '20250108_1730_388'], description: 'Select the Git tag to build')
+	//choice(name: 'GIT_TAG', choices: ['20241206', '20250108_1730_388'], description: 'Select the Git tag to build')
+	choice(name: 'REPO_CHOICE', choices: ['ipu7-drivers', 'ipu6-drivers'], description: 'Select the driver repo')
+	string(name: 'TAG_CHOICE', defaultValue: '', description: 'Enter tag (you can update this later after clone)')
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Clone Selected Repo') {
             steps {
-		cloneRepo(params.GIT_TAG)
+		script {
+			def selectedRepo = params.REPO_CHOICE
+			cloneRepo(selectedRepo)
+		}
+		//cloneRepo(params.GIT_TAG)
             }
         }
+
+	stage('Show Tags for Repo') {
+	   steps {
+		script {
+			def tags = select.getGitTags(params.REPO_CHOICE)
+			echo "Available tags for ${params.REPO_CHOICE}: ${tags}"
+		}
+	   }
+	}
+
+	stage('Checkout Tag') {
+	   steps {
+		script {
+			def selectedTag = params.TAG_CHOICE
+			def repo = params.REPO_CHOICE
+			dir(repo) {
+				sh "git checkout ${selectedTag}"
+			}
+		}
+	   }
+	}	
     }
 }
